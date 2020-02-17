@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="../public/bootstrap.min.css">
+    <link rel="stylesheet" href="../public/main.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js'></script>
+    <script src="../public/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+</head>
+<html>
+<body>
+<div id="container">
+    <h3>Find Section</h3>
+    <form id="queryForm">
+        <div class="form-group">
+            <button type="button" class="test" id = "btnUpload">Upload dataset file</button><br>
+            <input type="file" name="fileUpload" id="fileUpload" />
+            <label for="ANDOR">And/Or/Neither:</label>
+            <select class="form-control" id="ANDOR"> And/Or/Neither:
+                <option value="Neither"> Neither and/or</option>
+                <option value="AND"> And </option>
+                <option value="OR"> Or</option>
+            </select> <br>
+
+            <label for="department">Department:</label>
+            <textarea class="form-control" rows="1" id="department"></textarea>
+            <label for="course-number">Course number:</label>
+            <textarea class="form-control" rows="1" id="course-number"></textarea>
+            <label for="course-instructor">Course instructor:</label>
+            <textarea class="form-control" rows="1" id="course-instructor"></textarea>
+            <label for="course-title">Course title:</label>
+            <textarea class="form-control" rows="1" id="course-title"></textarea><br>
+
+            <label for="section-size-select">Section size: </label>
+            <select class="form-control" id="section-size-select">
+                <option value="Equal"> Equal </option>
+                <option value="Less than"> Less than </option>
+                <option value="Greater than"> Greater than</option>
+            </select>
+            <label for="section-size"></label>
+            <textarea class="form-control" rows="1" id="section-size"></textarea><br>
+
+            <label for="sort"> Sort direction: </label>
+            <select class="form-control" id="sort">
+                <option value="Default"> Default</option>
+                <option value="Up"> Up </option>
+                <option value="Down"> Down</option>
+            </select>
+
+            <label for="sortby">Sort by key(s): </label>
+            <textarea class="form-control" rows="1" id="sortby"></textarea>
+            <!--<button type="submit" class="submitsection" id="submitsection">Submit</button>-->
+
+        </div>
+        <div>
+            <h3>Filter Courses (optional APPLY parameters available here)</h3>
+            <!--<label for="ANDOR1">And/Or/Neither:</label>-->
+            <!--<select class="form-control" id="ANDOR1"> And/Or/Neither:-->
+            <!--<option value="Neither"> Neither and/or</option>-->
+            <!--<option value="AND"> And </option>-->
+            <!--<option value="OR"> Or</option>-->
+            <!--</select> <br>-->
+
+            <!--<label for="department1">Department:</label>-->
+            <!--<textarea class="form-control" rows="1" id="department1"></textarea>-->
+            <!--<label for="course-number1">Course number:</label>-->
+            <!--<textarea class="form-control" rows="1" id="course-number1"></textarea>-->
+            <!--<label for="course-instructor1">Course instructor:</label>-->
+            <!--<textarea class="form-control" rows="1" id="course-instructor1"></textarea>-->
+            <!--<label for="course-title1">Course title:</label>-->
+            <!--<textarea class="form-control" rows="1" id="course-title1"></textarea>-->
+
+            <!--<label for="section-size-select1">Section size: </label>-->
+            <!--<select class="form-control" id="section-size-select1">-->
+            <!--<option value="">Select</option>-->
+            <!--<option value="EQ"> Equal </option>-->
+            <!--<option value="LT"> Less than </option>-->
+            <!--<option value="GT"> Greater than</option>-->
+            <!--</select>-->
+            <!--<label for="section-size1"></label>-->
+            <!--<textarea class="form-control" rows="1" id="section-size1"></textarea>-->
+
+            <label for="highest-select"> Find highest: </label>
+            <select class="form-control" id="highest-select">
+                <option value=""> Select </option>
+                <option value="Average"> Average </option>
+                <option value="Pass"> Number of passes</option>
+                <option value="Fail"> Number of fails</option>
+                <option value="# of Sections"> Number of sections </option>
+            </select>
+
+            <label for="lowest-select"> Find lowest: </label>
+            <select class="form-control" id="lowest-select">
+                <option value=""> Select </option>
+                <option value="Average"> Average </option>
+                <option value="Pass"> Number of passes</option>
+                <option value="Fail"> Number of fails</option>
+                <option value="SectionNum"> Number of sections </option>
+            </select>
+
+            <!--<label for="sortby">Sort by key(s): </label>-->
+            <!--<textarea class="form-control" rows="1" id="sortby1"></textarea>-->
+            <!--</div>-->
+
+
+
+            <button type="button" class="test" id = "testquery">Submit</button>
+        </div>
+
+    </form>
+</div>
+<table id="tblResults">
+    <h3>Result</h3>
+</table>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="closeerror" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+<script>
+    var cols = ["courses_dept", "courses_id", "courses_avg", "courses_instructor", "courses_title", "courses_fail",
+        "courses_audit", "courses_uuid", "courses_year", "courses_size"]
+
+    $("#testbutton").click(function() {
+        var test = $($("#testselect").val()).val();
+    })
+
+    $("#btnUpload").click(function() {
+        var fileToLoad = document.getElementById("fileUpload").files[0];
+        var fileReader = new FileReader();
+        fileReader.readAsArrayBuffer(fileToLoad);
+        fileReader.onload = function(evt) {
+            var id = fileToLoad.name.split('.')[0];
+            var content = evt.target.result;
+            var formData = new FormData();
+            formData.append('body', new Blob([content]));
+
+            $.ajax({
+                url: 'http://localhost:4321/dataset/' + id,
+                type: 'put',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(result,status){
+                    console.log('YAY')
+                },
+//                error: function (jqXHR, textStatus, errorThrown) {
+//                    console.log(errorThrown)
+//                }
+            })
+        }
+
+    });
+    $("#testquery").click(function() {
+        cols = ["courses_dept", "courses_id", "courses_avg", "courses_instructor", "courses_title", "courses_fail",
+            "courses_audit", "courses_uuid", "courses_year", "courses_size"]
+        var query = {
+            "WHERE": {},
+            "OPTIONS": {"COLUMNS": cols, "FORM":"TABLE"}
+        }
+
+
+        if ($("#sort").val() == "Default") {
+            if ($("#sortby").val() != "") {
+                query["OPTIONS"]["ORDER"]= $("#sortby").val();
+            }
+        }
+        if ($("#sort").val() == "Up" ) {
+            query["OPTIONS"]["ORDER"] = {};
+            query["OPTIONS"]["ORDER"]["dir"] = "UP";
+        }
+        else if ($("#sort").val() == "Down") {
+            query["OPTIONS"]["ORDER"] = {};
+            query["OPTIONS"]["ORDER"]["dir"] = "DOWN";
+        }
+
+        if ($("#sortby").val() != "") {
+            query["OPTIONS"]["ORDER"]["keys"] = [];
+            query["OPTIONS"]["ORDER"]["keys"] = ($("#sortby").val()).split(',');
+        }
+
+        if ($("#ANDOR").val() == "Neither") {
+            if ($("#department").val() != "") {
+                query["WHERE"]["IS"] = {"courses_dept": $("#department").val().toLowerCase()};
+            }
+            if ($("#course-number").val() != "") {
+                query["WHERE"]["IS"] = {"courses_id": $("#course-number").val().toLowerCase()};
+            }
+            if ($("#course-instructor").val() != "") {
+                query["WHERE"]["IS"] = {"courses_instructor": $("#course-instructor").val().toLowerCase()};
+            }
+
+            if ($("#course-title").val() != "") {
+                query["WHERE"]["IS"] = {"courses_title": $("#course-title").val().toLowerCase()};
+            }
+
+            if ($("#section-size").val() != "") {
+                if (typeof ($("#section-size").val()) == "number"){
+                if ($("#section-size-select").val() == "Equal") {
+                    query["WHERE"]["EQ"] = {"courses_size": parseInt($("#section-size").val(), 10)}
+                }
+                else if ($("#section-size-select").val() == "Less than") {
+                    query["WHERE"]["LT"] = {"courses_size": parseInt($("#section-size").val(), 10)}
+                }
+                else if ($("#section-size-select").val() == "Greater than") {
+                    query["WHERE"]["GT"] = {"courses_size": parseInt($("#section-size").val(), 10)}
+                }
+            }
+            else {//error throw}
+            }
+
+        }
+        else if ($("#ANDOR").val() == "AND") {
+            query["WHERE"] = {"AND": []};
+            if ($("#department").val() != "") {
+                query["WHERE"]["AND"].push({"IS":{"courses_dept": $("#department").val().toLowerCase()}});
+            }
+            if ($("#course-number").val() != "") {
+                query["WHERE"]["AND"].push({"IS":{"courses_id": $("#course-number").val().toLowerCase()}});
+            }
+            if ($("#course-instructor").val() != "") {
+                query["WHERE"]["AND"].push({"IS":{"courses_instructor": $("#course-instructor").val().toLowerCase()}});
+            }
+
+            if ($("#course-title").val() != "") {
+                query["WHERE"]["AND"].push({"IS":{"courses_title": $("#course-title").val().toLowerCase()}});
+            }
+
+            if ($("#section-size").val() != "") {
+                if (typeof ($("#section-size").val()) == "number"){
+
+
+                if ($("#section-size-select").val() == "Equal") {
+                    query["WHERE"]["AND"].push({"EQ": {"courses_size": parseInt($("#section-size").val(), 10)}});
+                }
+                else if ($("#section-size-select").val() == "Less than") {
+                    query["WHERE"]["AND"].push({"LT": {"courses_size": parseInt($("#section-size").val(), 10)}});
+                }
+                else if ($("#section-size-select").val() == "Greater than") {
+                    query["WHERE"]["AND"].push({"GT": {"courses_size": parseInt($("#section-size").val(), 10)}});
+                }
+            }
+            //error throw}
+        }}
+
+        else if ($("#ANDOR").val() == "OR") {
+            query["WHERE"] = {"OR": []};
+            if ($("#department").val() != "") {
+                query["WHERE"]["OR"].push({"IS":{"courses_dept": $("#department").val().toLowerCase()}});
+            }
+            if ($("#course-number").val() != "") {
+                query["WHERE"]["OR"].push({"IS":{"courses_id": $("#course-number").val().toLowerCase()}});
+            }
+            if ($("#course-instructor").val() != "") {
+                query["WHERE"]["OR"].push({"IS":{"courses_instructor": $("#course-instructor").val().toLowerCase()}});
+            }
+
+            if ($("#course-title").val() != "") {
+                query["WHERE"]["OR"].push({"IS":{"courses_title": $("#course-title").val().toLowerCase()}});
+            }
+
+            if ($("#section-size").val() != "") {
+                if (typeof ($("#section-size").val()) == "number"){
+
+
+                if ($("#section-size-select").val() == "Equal") {
+                    query["WHERE"]["OR"].push({"EQ": {"courses_size": parseInt($("#section-size").val(), 10)}});
+                }
+                else if ($("#section-size-select").val() == "Less than") {
+                    query["WHERE"]["OR"].push({"LT": {"courses_size": parseInt($("#section-size").val(), 10)}});
+                }
+                else if ($("#section-size-select").val() == "Greater than") {
+                    query["WHERE"]["OR"].push({"GT": {"courses_size": parseInt($("#section-size").val(), 10)}});
+                }
+            } //error throw
+        }}
+
+        if ($("#highest-select").val() != "" || $("#lowest-select").val() != "") {
+            query["TRANSFORMATIONS"] = {}; //"GROUP":[], "APPLY":[]
+            query["TRANSFORMATIONS"]["GROUP"] = ["courses_dept", "courses_id"];
+            query["TRANSFORMATIONS"]["APPLY"] = [];
+            if ($("#highest-select").val() != "") {
+                if ($("#highest-select").val() == "Average") {
+                    query["TRANSFORMATIONS"]["APPLY"].push({"maxavg": {"MAX": "courses_avg"}});
+                    query["OPTIONS"]["COLUMNS"].push("maxavg");
+
+                }
+                if ($("#highest-select").val() == "Pass") {
+                    query["TRANSFORMATIONS"]["APPLY"].push({"maxpass": {"MAX": "courses_pass"}});
+                    query["OPTIONS"]["COLUMNS"].push("maxpass");
+
+
+                }
+                if ($("#highest-select").val() == "Fail") {
+                    query["TRANSFORMATIONS"]["APPLY"].push({"maxfail": {"MAX": "courses_fail"}});
+                    query["OPTIONS"]["COLUMNS"].push("maxfail");
+
+
+                }
+                if ($("#highest-select").val() == "SectionNum") {
+                    query["TRANSFORMATIONS"]["APPLY"].push({"maxsize": {"MAX": "courses_size"}});
+                    query["OPTIONS"]["COLUMNS"].push("maxsize");
+
+
+                }
+            }
+
+            if ($("#lowest-select").val() != "") {
+                if ($("#lowest-select").val() == "Average") {
+                    query["TRANSFORMATIONS"]["APPLY"].push({"minavg": {"MIN": "courses_avg"}});
+                    query["OPTIONS"]["COLUMNS"].push("minavg");
+
+
+                }
+                if ($("#lowest-select").val() == "Pass") {
+                    query["TRANSFORMATIONS"]["APPLY"].push({"minpass": {"MIN": "courses_pass"}});
+                    query["OPTIONS"]["COLUMNS"].push("minpass");
+
+
+
+                }
+                if ($("#lowest-select").val() == "Fail") {
+                    query["TRANSFORMATIONS"]["APPLY"].push({"minfail": {"MIN": "courses_fail"}});
+                    query["OPTIONS"]["COLUMNS"].push("minfail");
+
+
+
+                }
+                if ($("#lowest-select").val() == "SectionNum") {
+                    query["TRANSFORMATIONS"]["APPLY"].push({"minsize": {"MIN": "courses_size"}});
+                    query["OPTIONS"]["COLUMNS"].push("minsize");
+
+
+
+                }
+            }
+        }
+
+
+
+        query = JSON.stringify(query)
+        $.ajax({
+            url: 'http://localhost:4321/query',
+            type: 'post',
+            data: query,
+            dataType: 'json',
+            contentType: 'application/json',
+            error: function(xhr,status,errorThrown){
+                window.alert(status,JSON.parse(xhr.responseText))
+            },
+            success: function(data){
+                generateTable(data.result)
+            }
+
+        })
+
+
+
+
+    }})
+
+    function generateTable(data) {
+
+            $("#tblResults").empty()
+            var tbl_body = document.createElement("tbody");
+            var odd_even = false;
+            console.log(data)
+
+            var colHeaders = tbl_body.insertRow();
+            $.each(cols,function(){
+                var cell = colHeaders.insertCell();
+                cell.appendChild(document.createTextNode(this));
+            })
+
+            $.each(data, function () {
+                var tbl_row = tbl_body.insertRow();
+                tbl_row.className = odd_even ? "odd" : "even";
+                $.each(this, function (k, v) {
+                    var cell = tbl_row.insertCell();
+                    cell.appendChild(document.createTextNode(v.toString()));
+                })
+                odd_even = !odd_even;
+            })
+            document.getElementById("tblResults").appendChild(tbl_body);
+            $("#tblResults").append(tbl_body);
+    }
+
+</script>
+</html>

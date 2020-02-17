@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="../public/bootstrap.min.css">
+    <link rel="stylesheet" href="../public/main.css">
+    <script src="../public/jquery.min.js"></script>
+    <script src="../public/bootstrap.min.js"></script>
+    <script src="../public/d3.min.js"></script>
+    <script src="../public/room_schedule.js"></script>
+</head>
+<html>
+<body>
+<div id="container">
+    <form id="queryForm">
+        <h3>Courses to be scheduled</h3>
+        <div class="form-group">
+            <p><label for="department">Department</label>
+                <textarea class="form-control" rows="1" id="department"></textarea></p>
+            <p><select id="course_dropdown">
+                <option value="and">and</option>
+                <option value="or">or</option>
+            </select></p>
+            <p><label for="course-number">Course Number:</label>
+                <textarea class="form-control" rows="1" id="course-number"></textarea></p>
+        </div>
+
+
+    <div class="form-group">
+        <h3>Available rooms</h3>
+        <p><label for="building-name">Building:</label>
+            <textarea class="form-control" rows="1" id="building-name"></textarea></p>
+        <p><select id="building_dropdown">
+            <option value="and">and</option>
+            <option value="or">or</option>
+        </select></p>
+        <p><label for="another-building-name">Building:</label>
+            <textarea class="form-control" rows="1" id="another-building-name"></textarea></p>
+        <p><label for="dist">Within:</label>
+            <input type="number" id="dist" min="0"> meters</p>
+
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <table id="tblResults">
+        <h3>Schedule</h3>
+    </table>
+</div>
+</body>
+</html>

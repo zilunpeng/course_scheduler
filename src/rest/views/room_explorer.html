@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="../public/bootstrap.min.css">
+    <link rel="stylesheet" href="../public/main.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js'></script>
+    <script src="../public/d3.min.js"></script>
+    <script src="../public/room_explorer.js"></script>
+</head>
+<html>
+<body>
+<div id="container">
+    <h3>Query</h3>
+    <form id="queryForm">
+        <div class="form-group">
+            <button type="button" class="test" id = "btnUpload">Upload file</button><br>
+            <input type="file" name="fileUpload" id="fileUpload" />
+
+            <label for="ANDOR">And/Or/Neither:</label>
+            <select class="form-control" id="ANDOR"> And/Or/Neither:
+                <option value="Neither"> Neither and/or</option>
+                <option value="AND"> And </option>
+                <option value="OR"> Or</option>
+            </select> <br>
+            <label for="building-name">Building short name:</label>
+            <textarea class="form-control" rows="1" id="building-name"></textarea>
+            <label for="room-number">Room number:</label>
+            <textarea class="form-control" rows="1" id="room-number"></textarea>
+            <label for="within-dist">Location: within </label>
+            <div class="row">
+                <div class="col-md-1">
+                    <input type="text" class="form-control" id="within-dist">
+                </div>
+                <div class="col-md-1">
+                   <h5>meters from :</h5>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" id="within-building">
+                </div>
+                <button type="button" class="test" id="show">Show</button>
+            </div>
+                <label for="room-size">Room size:</label>
+            <select class="form-control" id="room-size-select">
+                <option value="Equal"> Equal </option>
+                <option value="Less than"> Less than </option>
+                <option value="Greater than"> Greater than</option>
+            </select>
+            <textarea class="form-control" rows="1" id="room-size"></textarea>
+            <label for="furniture-type">Furniture type:</label>
+
+            <select class="furniture-type-select" id="furniture-type">
+                <option value="">Select</option>
+                <option value="Classroom-Learn Lab"> Classroom-Learn Lab</option>
+                <option value="Classroom-Hybrid Furniture"> Classroom-Hybrid Furniture</option>
+                <option value="Classroom-Moveable Tablets"> Classroom-Moveable Tablets</option>
+                <option value="Classroom-Fixed Tables/Movable Chairs"> Classroom-Fixed Tables/Movable Chairs</option>
+                <option value="Classroom-Movable Tables & Chairs"> Classroom-Movable Tables & Chairs</option>
+                <option value="Classroom-Fixed Tablets"> Classroom-Fixed Tablets</option>
+            </select>
+            <label for="room-type">Room type:</label>
+            <select class="furniture-type-select" id="room-type">
+                <option value="">Select</option>
+                <option value="Tiered Large Group">Tiered Large Group</option>
+                <option value="Small Group">Small Group</option>
+                <option value="Studio Lab"> Studio Lab</option>
+                <option value="Case Style"> Case Style</option>
+                <option value="Active Learning"> Active Learning</option>
+                <option value="Open Design General Purpose">Open Design General Purpose</option>
+
+            </select><br>
+            <label for="sort"> Sort direction: </label>
+            <select class="form-control" id="sort">
+                <option value="Default"> Default</option>
+                <option value="Up"> Up </option>
+                <option value="Down"> Down</option>
+            </select>
+
+            <label for="sortby">Sort by key(s): </label>
+            <textarea class="form-control" rows="1" id="sortby"></textarea>
+        </div>
+        <button type="button" class="test" id="testquery1">Submit</button>
+    </form>
+</div>
+<table id="tblResults">
+    <h3>Result</h3>
+</table>
+</body>
+<script>
+var cols = ["rooms_fullname", "rooms_shortname", "rooms_number", "rooms_name", "rooms_address", "rooms_lat", "rooms_lon"
+    , "rooms_seats", "rooms_type", "rooms_furniture", "rooms_href"];
+
+    $('#show').click(function(){
+        var baseBuilding = $('#within-building').val()
+        var baseLat = null;
+        var baseLon = null;
+        for(var i in array){
+            if(array[i]["rooms_shortname"] == baseBuilding){
+                baseLat = array[i]["rooms_lat"]
+                baseLon = array[i]["rooms_lon"]
+            }
+        }
+
+//        $('#tblResults').each(function(i){
+//            $(this).each(function(j,v){
+//                console.log(v.toString())
+//            });
+//        });
+
+    })
+
+    function updateTable(data){
+        var baseLat = data["result"][0]["rooms_lat"]
+        var baseLon = data["result"][0]["rooms_lon"]
+            getDistanceFromLatLonInM(baseLat,baseLon)
+
+
+    }
+
+var array = [{
+    "rooms_shortname": "WOOD",
+    "rooms_lat": 49.26478,
+    "rooms_lon": -123.24673
+},
+    {
+        "rooms_shortname": "SWNG",
+        "rooms_lat": 49.26293,
+        "rooms_lon": -123.25431
+    }, {
+        "rooms_shortname": "WESB",
+        "rooms_lat": 49.26517,
+        "rooms_lon": -123.24937
+    },{
+        "rooms_shortname": "MGYM",
+        "rooms_lat": 49.2663,
+        "rooms_lon": -123.2466
+    },{
+        "rooms_shortname": "UCLL",
+        "rooms_lat": 49.26867,
+        "rooms_lon": -123.25692
+    },{
+        "rooms_shortname": "SRC",
+        "rooms_lat": 49.2683,
+        "rooms_lon": -123.24894
+    },{
+        "rooms_shortname": "SPPH",
+        "rooms_lat": 49.2642,
+        "rooms_lon": -123.24842
+    },{
+        "rooms_shortname": "OSBO",
+        "rooms_lat": 49.26047,
+        "rooms_lon": -123.24467
+    },{
+        "rooms_shortname": "PCOH",
+        "rooms_lat": 49.264,
+        "rooms_lon": -123.2559
+    },{
+        "rooms_shortname": "PHRM",
+        "rooms_lat": 49.26229,
+        "rooms_lon": -123.24342
+    },{
+        "rooms_shortname": "PHRM",
+        "rooms_lat": 49.26229,
+        "rooms_lon": -123.24342
+    },{
+        "rooms_shortname": "SCRF",
+        "rooms_lat": 49.26398,
+        "rooms_lon": -123.2531
+    },{
+        "rooms_shortname": "MATX",
+        "rooms_lat": 49.266089,
+        "rooms_lon": -123.254816
+    },{
+        "rooms_shortname": "MATH",
+        "rooms_lat": 49.266463,
+        "rooms_lon": -123.255534
+    },{
+        "rooms_shortname": "MCML",
+        "rooms_lat": 49.26114,
+        "rooms_lon": -123.25027
+    },{
+        "rooms_shortname": "MCLD",
+        "rooms_lat": 49.26176,
+        "rooms_lon": -123.24935
+    },{
+        "rooms_shortname": "LSC",
+        "rooms_lat": 49.26236,
+        "rooms_lon": -123.24494
+    },{
+        "rooms_shortname": "LSK",
+        "rooms_lat": 49.26545,
+        "rooms_lon": -123.25533
+    },{
+        "rooms_shortname": "SOWK",
+        "rooms_lat": 49.2643,
+        "rooms_lon": -123.25505
+    },{
+        "rooms_shortname": "IBLC",
+        "rooms_lat": 49.26766,
+        "rooms_lon": -123.2521
+    },{
+        "rooms_shortname": "IONA",
+        "rooms_lat": 49.27106,
+        "rooms_lon": -123.25042
+    },{
+        "rooms_shortname": "DMP",
+        "rooms_lat": 49.26125,
+        "rooms_lon": -123.24807
+    },{
+        "rooms_shortname": "ANGU",
+        "rooms_lat": 49.26486,
+        "rooms_lon": -123.25364
+    },{
+        "rooms_shortname": "HENN",
+        "rooms_lat": 49.26627,
+        "rooms_lon": -123.25374
+    },{
+        "rooms_shortname": "HEBB",
+        "rooms_lat": 49.2661,
+        "rooms_lon": -123.25165
+    },{
+        "rooms_shortname": "GEOG",
+        "rooms_lat": 49.26605,
+        "rooms_lon": -123.25623
+    },{
+        "rooms_shortname": "LASR",
+        "rooms_lat": 49.26767,
+        "rooms_lon": -123.25583
+    },{
+        "rooms_shortname": "FORW",
+        "rooms_lat": 49.26176,
+        "rooms_lon": -123.25179
+    },{
+        "rooms_shortname": "FSC",
+        "rooms_lat": 49.26044,
+        "rooms_lon": -123.24886
+    }, {
+        "rooms_shortname": "FNH",
+        "rooms_lat": 49.26414,
+        "rooms_lon": -123.24959
+    },
+    {
+        "rooms_shortname": "ESB",
+        "rooms_lat": 49.26274,
+        "rooms_lon": -123.25224
+    },{
+        "rooms_shortname": "EOSM",
+        "rooms_lat": 49.26228,
+        "rooms_lon": -123.25198
+    },
+    {
+        "rooms_shortname": "CEME",
+        "rooms_lat": 49.26273,
+        "rooms_lon": -123.24894
+    },{
+        "rooms_shortname": "CHEM",
+        "rooms_lat": 49.2659,
+        "rooms_lon": -123.25308
+    },
+    {
+        "rooms_shortname": "CHBE",
+        "rooms_lat": 49.26228,
+        "rooms_lon": -123.24718
+    },{
+        "rooms_shortname": "CIRS",
+        "rooms_lat": 49.26207,
+        "rooms_lon": -123.25314
+    },
+    {
+        "rooms_shortname": "BUCH",
+        "rooms_lat": 49.26826,
+        "rooms_lon": -123.25468
+    },{
+        "rooms_shortname": "BRKX",
+        "rooms_lat": 49.26862,
+        "rooms_lon": -123.25237
+    },
+    {
+        "rooms_shortname": "BIOL",
+        "rooms_lat": 49.26479,
+        "rooms_lon": -123.25249
+    },{
+        "rooms_shortname": "AUDX",
+        "rooms_lat": 49.2666,
+        "rooms_lon": -123.25655
+    },
+    {
+        "rooms_shortname": "AERL",
+        "rooms_lat": 49.26372,
+        "rooms_lon": -123.25099
+    },{
+        "rooms_shortname": "ANSO",
+        "rooms_lat": 49.26958,
+        "rooms_lon": -123.25741
+    },
+    {
+        "rooms_shortname": "ALRD",
+        "rooms_lat": 49.2699,
+        "rooms_lon": -123.25318
+    }]
+    $('#testquery1').click(function() {
+        cols = ["rooms_fullname", "rooms_shortname", "rooms_number", "rooms_name", "rooms_address", "rooms_lat", "rooms_lon"
+            , "rooms_seats", "rooms_type", "rooms_furniture", "rooms_href"]
+        //  var sampleQuery = { "WHERE": { "IS": { "rooms_name": "DMP_*" } }, "OPTIONS": { "COLUMNS": [ "rooms_name" ], "ORDER": "rooms_name", "FORM": "TABLE" } }
+        var query = {
+            "WHERE": {},
+            "OPTIONS": {"COLUMNS": cols,"FORM":"TABLE"}
+        }
+
+        if ($("#sort").val() == "Default") {
+            if ($("#sortby").val() != "") {
+                query["OPTIONS"]["ORDER"]= $("#sortby").val();
+            }
+        }
+        if ($("#sort").val() == "Up" ) {
+            query["OPTIONS"]["ORDER"] = {};
+            query["OPTIONS"]["ORDER"]["dir"] = "UP";
+        }
+        else if ($("#sort").val() == "Down") {
+            query["OPTIONS"]["ORDER"] = {};
+            query["OPTIONS"]["ORDER"]["dir"] = "DOWN";
+        }
+
+        if ($("#sortby").val() != "") {
+            query["OPTIONS"]["ORDER"]["keys"] = [];
+            query["OPTIONS"]["ORDER"]["keys"] = ($("#sortby").val()).split(',');
+        }
+
+        if ($("#ANDOR").val() == "Neither") {
+            if ($("#building-name").val() != "") {
+                query["WHERE"]["IS"] = {"rooms_shortname": $("#building-name").val()};
+            }
+            else if ($("#room-number").val()!= "" ){
+                query["WHERE"]["IS"] = {"rooms_number": $("#room-number").val()};
+            }
+            else if ($("#within-dist").val()!= "" && $("#within-building").val()!= "") {
+
+            }
+
+            if ($("#room-size").val() != "") {
+                if ($("#room-size-select").val() == "Equal") {
+                    query["WHERE"]["EQ"] = {"rooms_seats": parseInt($("#room-size").val(), 10)}
+                }
+                else if ($("#room-size-select").val() == "Less than") {
+                    query["WHERE"]["LT"] = {"rooms_seats": parseInt($("#room-size").val(), 10)}
+                }
+                else if ($("#room-size-select").val() == "Greater than") {
+                    query["WHERE"]["GT"] = {"rooms_seats": parseInt($("#room-size").val(), 10)}
+
+                }
+            }
+
+            if ($("#furniture-type").val() != "") {
+                if ($("#furniture-type").val() == "Classroom-Learn Lab" ||
+                    $("#furniture-type").val() == "Classroom-Hybrid Furniture" ||
+                    $("#furniture-type").val() == "Classroom-Moveable Tablets" ||
+                    $("#furniture-type").val() == "Classroom-Fixed Tables/Movable Chairs" ||
+                    $("#furniture-type").val() == "Classroom-Movable Tables & Chairs" ||
+                    $("#furniture-type").val() == "Classroom-Fixed Tablets"){
+                    query["WHERE"]["IS"] = {"rooms_furniture": $("#furniture-type").val()}
+                }
+            }
+
+            if ($("#room-type").val() != "") {
+                if ($("#room-type").val() == "Tiered Large Group" ||
+                    $("#room-type").val() == "Small Group" ||
+                    $("#room-type").val() == "Studio Lab" ||
+                    $("#room-type").val() == "Case Style" ||
+                    $("#room-type").val() == "Active Learning" ||
+                    $("#room-type").val() == "Open Design General Purpose" ) {
+                    query["WHERE"]["IS"] = {"rooms_type": $("#room-type").val()}
+                }
+            }
+        }
+
+        else if ($("#ANDOR").val() == "AND") {
+            query["WHERE"] = {"AND": []};
+            if ($("#building-name").val() != "") {
+                query["WHERE"]["AND"].push({"IS": {"rooms_shortname": $("#building-name").val()}});
+            }
+            if ($("#room-number").val()!= "" ){
+                query["WHERE"]["AND"].push({"IS":{"rooms_number": $("#room-number").val()}});
+            }
+            if ($("#within-dist").val()!= "" && $("#within-building").val()!= "") {
+
+            }
+
+            if ($("#room-size").val() != "") {
+                if ($("#room-size-select").val() == "Equal") {
+                    query["WHERE"]["AND"].push({"EQ" : {"rooms_seats": parseInt($("#room-size").val(), 10)}});
+                }
+                else if ($("#room-size-select").val() == "Less than") {
+                    query["WHERE"]["AND"].push({"LT" : {"rooms_seats": parseInt($("#room-size").val(), 10)}});
+                }
+                else if ($("#room-size-select").val() == "Greater than") {
+                    query["WHERE"]["AND"].push({"GT" : {"rooms_seats": parseInt($("#room-size").val(), 10)}});
+                }
+            }
+            if ($("#furniture-type").val() != "") {
+                if ($("#furniture-type").val() == "Classroom-Learn Lab" ||
+                    $("#furniture-type").val() == "Classroom-Hybrid Furniture" ||
+                    $("#furniture-type").val() == "Classroom-Moveable Tablets" ||
+                $("#furniture-type").val() == "Classroom-Fixed Tables/Movable Chairs" ||
+                $("#furniture-type").val() == "Classroom-Movable Tables & Chairs" ||
+                $("#furniture-type").val() == "Classroom-Fixed Tablets"){
+                    query["WHERE"]["AND"].push({"IS":{"rooms_furniture": $("#furniture-type").val()}})
+                }
+
+            }
+
+            if ($("#room-type").val() != "") {
+                if ($("#room-type").val() == "Tiered Large Group" ||
+                    $("#room-type").val() == "Small Group" ||
+                    $("#room-type").val() == "Studio Lab" ||
+                    $("#room-type").val() == "Case Style" ||
+                    $("#room-type").val() == "Active Learning" ||
+                    $("#room-type").val() == "Open Design General Purpose" ) {
+                    query["WHERE"]["AND"].push({"IS":{"rooms_type": $("#room-type").val()}});
+                }
+            }
+        }
+        else if ($("#ANDOR").val() == "OR") {
+            query["WHERE"] = {"OR": []};
+            if ($("#building-name").val() != "") {
+                query["WHERE"]["OR"].push({"IS":{"rooms_shortname": $("#building-name").val()}});
+            }
+            if ($("#room-number").val()!= "" ){
+                query["WHERE"]["OR"].push({"IS":{"rooms_number": $("#room-number").val()}});
+            }
+            if ($("#within-dist").val()!= "" && $("#within-building").val()!= "") {
+
+            }
+
+            if ($("#room-size").val() != "") {
+                if ($("#room-size-select").val() == "Equal") {
+                    query["WHERE"]["OR"].push({"EQ" : {"rooms_seats": parseInt($("#room-size").val(), 10)}});
+                }
+                else if ($("#room-size-select").val() == "Less than") {
+                    query["WHERE"]["OR"].push({"LT" : {"rooms_seats": parseInt($("#room-size").val(), 10)}});
+                }
+                else if ($("#room-size-select").val() == "Greater than") {
+                    query["WHERE"]["OR"].push({"GT" : {"rooms_seats": parseInt($("#room-size").val(), 10)}});
+                }
+            }
+            if ($("#furniture-type").val() != "") {
+                if ($("#furniture-type").val() == "Classroom-Learn Lab" ||
+                    $("#furniture-type").val() == "Classroom-Hybrid Furniture" ||
+                    $("#furniture-type").val() == "Classroom-Moveable Tablets" ||
+                    $("#furniture-type").val() == "Classroom-Fixed Tables/Movable Chairs" ||
+                    $("#furniture-type").val() == "Classroom-Movable Tables & Chairs" ||
+                    $("#furniture-type").val() == "Classroom-Fixed Tablets"){
+                    query["WHERE"]["OR"].push({"IS":{"rooms_furniture": $("#furniture-type").val()}})
+                }
+            }
+
+            if ($("#room-type").val() != "") {
+                if ($("#room-type").val() == "Tiered Large Group" ||
+                    $("#room-type").val() == "Small Group" ||
+                    $("#room-type").val() == "Studio Lab" ||
+                    $("#room-type").val() == "Case Style" ||
+                    $("#room-type").val() == "Active Learning" ||
+                    $("#room-type").val() == "Open Design General Purpose" ) {
+                    query["WHERE"]["OR"].push({"IS":{"rooms_type": $("#room-type").val()}});
+                }
+            }
+        }
+
+
+        query = JSON.stringify(query)
+        $.ajax({
+            url: 'http://localhost:4321/query',
+            type: 'post',
+            data: query,
+            dataType: 'json',
+            contentType: 'application/json',
+            error: function(xhr,status,errorThrown){
+                window.alert(status,JSON.parse(xhr.responseText))
+            },
+            success: function(data){
+                generateTable(data.result)
+            }
+
+        })
+    })
+
+
+
+    $("#btnUpload").click(function() {
+        var fileToLoad = document.getElementById("fileUpload").files[0];
+        var fileReader = new FileReader();
+        fileReader.readAsArrayBuffer(fileToLoad);
+        fileReader.onload = function(evt) {
+            var id = fileToLoad.name.split('.')[0];
+            var content = evt.target.result;
+            var formData = new FormData();
+            formData.append('body', new Blob([content]));
+
+            $.ajax({
+                url: 'http://localhost:4321/dataset/' + id,
+                type: 'put',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(result,status){
+                },
+//                error: function (jqXHR, textStatus, errorThrown) {
+//                    console.log(errorThrown)
+//                }
+            })
+        }
+
+    });
+
+    //within-dist, within-building
+    //from stackoverflow
+    function getDistanceFromLatLonInM(lat1,lon1,lat2,lon2) {
+
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(lat2-lat1);  // deg2rad below
+        var dLon = deg2rad(lon2-lon1);
+        var a =
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon/2) * Math.sin(dLon/2)
+            ;
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var d = R * c; // Distance in km
+        return d*1000;
+    }
+
+    function deg2rad(deg) {
+        return deg * (Math.PI/180)
+    }
+
+    function generateTable(data) {
+
+        $("#tblResults").empty()
+        var tbl_body = document.createElement("tbody");
+        var odd_even = false;
+        console.log(data)
+
+        var colHeaders = tbl_body.insertRow();
+        $.each(cols,function(){
+            var cell = colHeaders.insertCell();
+            cell.appendChild(document.createTextNode(this));
+        })
+
+        $.each(data, function () {
+            var tbl_row = tbl_body.insertRow();
+            tbl_row.className = odd_even ? "odd" : "even";
+            $.each(this, function (k, v) {
+                var cell = tbl_row.insertCell();
+                cell.appendChild(document.createTextNode(v.toString()));
+            })
+            odd_even = !odd_even;
+        })
+        document.getElementById("tblResults").appendChild(tbl_body);
+        $("#tblResults").append(tbl_body);
+    }
+
+</script>
+</html>
+
