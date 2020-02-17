@@ -30,5 +30,7 @@ The above figure shows parts of the schedule.
 <figure>
   <img height=80 src="imgs/code_coverage.png" alt="code coverage">
 </figure>
+
 2. Used a <a href="https://en.wikipedia.org/wiki/Flow_network" target="_blank">flow network</a> to solve the scheduling problem.
+
 3. Used <a href="https://www.npmjs.com/package/request-promise" target="_blank">promises</a> instead of call backs to handle asynchronous operations (e.g. sending/receiving requests, unzipping files, etc).
