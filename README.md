@@ -34,3 +34,20 @@ The above figure shows parts of the schedule.
 2. Used a <a href="https://en.wikipedia.org/wiki/Flow_network" target="_blank">flow network</a> to solve the scheduling problem.
 
 3. Used <a href="https://www.npmjs.com/package/request-promise" target="_blank">promises</a> instead of call backs to handle asynchronous operations (e.g. sending/receiving requests, unzipping files, etc).
+
+## Project commands:
+To build the project (note that Node (v6+) is required to run these commands):
+1. ```yarn run clean```
+
+1. ```yarn run configure```
+
+1. ```yarn run build```
+
+To start the server:
+
+1. ```yarn run start```
+
+1. open http://localhost:4321/
+
+## Acknowledgement:
+Thanks to Judy Chen for collaborating with me on this project.
